@@ -1,6 +1,5 @@
 import React from 'react'
 import { Form } from "react-bootstrap";
-import {useInput} from '../../../common/hooks/useInput'
 const Filter = ({ serviceCategories, onChangeFilter }) => {
 
     return (

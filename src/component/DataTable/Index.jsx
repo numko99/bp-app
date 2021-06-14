@@ -2,15 +2,18 @@ import React, { useState, useEffect, useMemo } from 'react'
 import TableHeader from './TableHeader/TableHeader'
 import Pagination from './Pagination/Pagination'
 import Search from './Search/Search'
-import { Container } from 'react-bootstrap'
-import firebase from '../../common/firebase'
+import { Container, Button } from 'react-bootstrap'
 import getData from '../../common/Api/getData'
 import Filter from './Filter/Filter'
-import AddService from './Forms/AddService'
-const DataTable = () => {
+import AddService from './Forms/AddService/AddService'
+import addData from '../../common/Api/addData'
+import deleteData from '../../common/Api/deleteData'
+import Confirmation from '../Modal/Confirmation/Confirmation'
+import { Redirect, Route,Switch,useHistory } from 'react-router-dom'
+import { withRouter } from "react-router";
+import EditService from './Forms/EditService/EditService'
 
-    const ref = firebase.firestore();
-
+const DataTable = (props) => {
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -22,6 +25,12 @@ const DataTable = () => {
     const [serviceCategoryFilter, setServiceCategoryFilter] = useState("");
     const [sorting, setSorting] = useState({ field: "", order: "" });
 
+    const [showAddServiceModal, SetShowAddServiceModal] = useState(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [deleteServiceId, setDeleteServiceId] = useState(0);
+
+    const history=useHistory();
+
     const headers = [
         { name: 'Name', field: 'Name', sortable: false },
         { name: 'Code', field: 'Code', sortable: true },
@@ -29,19 +38,20 @@ const DataTable = () => {
         { name: 'Duration', field: 'Duration', sortable: false },
         { name: 'Action', field: 'Action', sortable: false },]
 
+    const getSetServices = async () => {
+        var services = await getData("Services");
+        setServices(services);
+    }
+    const getSetCategories = async () => {
+        var categories = await getData("ServiceCategories");
+        setCategories(categories);
+    }
+
+
     useEffect(() => {
         var getDataa = async () => {
-            var services = await getData("Services");
-            console.log(services);
-            ref.collection("Services").onSnapshot(data=>{
-                var dataList = data.docs.map((doc) =>
-                                 ({ Id: doc.id, ...doc.data() }));
-                setServices(dataList);
-            })
-
-             var categories = await getData("ServiceCategories");
-            setServices(services);
-             setCategories(categories);
+            getSetServices();
+            getSetCategories();
         }
         getDataa();
     }, [])
@@ -50,7 +60,9 @@ const DataTable = () => {
     const servicesData = useMemo(() => {
         let computedServices = services.filter(x => (x.Name.toLowerCase().includes(search.toLowerCase()) &&
             (serviceCategoryFilter === "" || (x.ServiceCategoryId === serviceCategoryFilter))));
+            console.log(services);
 
+        console.log(serviceCategoryFilter);
         if (sorting.field) {
             const reversed = sorting.order === 'asc' ? 1 : -1;
             computedServices = computedServices.sort((a, b) =>
@@ -64,28 +76,32 @@ const DataTable = () => {
     }, [services, currentPage, search, sorting, serviceCategoryFilter])
 
 
-
     const serviceCategoryData = useMemo(() => {
         let computedServiceCategories = categories;
         return computedServiceCategories;
     }, [categories])
-   
-    const deleteField=(id)=>{
-        console.log("Prije");
-        ref.collection("Services").doc(id).delete();
-        console.log("Posle");
+
+    const deleteField = (id) => {
+        deleteData("Services", id);
+        getSetServices();
+        setShowConfirmationModal(false);
     }
     return (
         <>
-        
+            <Confirmation show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)} onSubmit={() => deleteField(deleteServiceId)} />
+            <AddService show={showAddServiceModal} onHide={() => SetShowAddServiceModal(false)}
+                onSucces={(value) => {
+                    addData("Services", value);
+                    SetShowAddServiceModal(false);
+                    getSetServices();
+                }} />
             <Container>
                 <div className="row w-100 mt-5">
                     <div className="col mb-3 col-12 text-center">
-
-
                         <div className="row mb-3 d-flex justify-content-end">
                             <div className="col-md-auto">
-                            <AddService />
+                                <Button variant="primary" onClick={() => SetShowAddServiceModal(true)}>Add new service</Button>
+
                             </div>
                         </div>
 
@@ -126,10 +142,13 @@ const DataTable = () => {
                                         <td>{service.Duration}</td>
                                         <td>
                                             <a className="btn text-primary">
-                                                <i className="fas fa-pencil-alt">U</i>
+                                                <i className="fas fa-pencil-alt" onClick={()=>history.push("/EditService/"+service.Id)}>U</i>
                                             </a>
                                             <a className="btn text-danger">
-                                                <i className="far fa-trash-alt" onClick={()=>deleteField(service.Id)}>D</i>
+                                                <i onClick={() => {
+                                                    setShowConfirmationModal(true)
+                                                    setDeleteServiceId(service.Id)
+                                                }}>D</i>
                                             </a>
                                         </td>
                                     </tr>
@@ -150,9 +169,12 @@ const DataTable = () => {
                         </div>
                     </div>
                 </div>
+                <Switch>
+            {/* <Route path={props.match.url+'/EditService/:id'} exact component={EditService} /> */}
+            </Switch>
             </Container>
         </>
     )
 }
 
-export default DataTable;
+export default withRouter(DataTable);
