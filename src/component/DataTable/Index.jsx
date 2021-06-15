@@ -1,19 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react'
+
 import TableHeader from './TableHeader/TableHeader'
 import Pagination from './Pagination/Pagination'
 import Search from './Search/Search'
-import { Container, Button } from 'react-bootstrap'
-import getData from '../../common/Api/getData'
 import Filter from './Filter/Filter'
+
 import AddService from './Forms/AddService/AddService'
-import addData from '../../common/Api/addData'
-import deleteData from '../../common/Api/deleteData'
 import Confirmation from '../Modal/Confirmation/Confirmation'
-import { Redirect, Route,Switch,useHistory } from 'react-router-dom'
+
+import BaseService from '../../common/Api/BaseService'
+import { service, serviceCategory } from '../../common/Collections'
+import { addToastMessage, deleteToastMessage } from '../../common/Toast/ToastMessages'
+import {notify} from '../../common/Toast/ToastNotification'
+
+import { ToastContainer, toast } from 'react-toastify';
+import { PencilSquare, Trash } from 'react-bootstrap-icons'
 import { withRouter } from "react-router";
-import EditService from './Forms/EditService/EditService'
+import { useHistory } from 'react-router-dom'
+import { Container, Button, Table } from 'react-bootstrap'
+
 
 const DataTable = (props) => {
+
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -29,21 +37,28 @@ const DataTable = (props) => {
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [deleteServiceId, setDeleteServiceId] = useState(0);
 
-    const history=useHistory();
+    const history = useHistory();
+    let baseServiceService = new BaseService(service);
+    let baseServiceCategory = new BaseService(serviceCategory);
+
 
     const headers = [
-        { name: 'Name', field: 'Name', sortable: false },
-        { name: 'Code', field: 'Code', sortable: true },
-        { name: 'Price', field: 'Price', sortable: false },
-        { name: 'Duration', field: 'Duration', sortable: false },
+        { name: 'Name', field: 'Name', sortable: true },
+        { name: 'Code', field: 'Code', sortable: false },
+        { name: 'Price', field: 'Price', sortable: true },
+        { name: 'Duration', field: 'Duration', sortable: true },
         { name: 'Action', field: 'Action', sortable: false },]
 
+
+
     const getSetServices = async () => {
-        var services = await getData("Services");
-        setServices(services);
+        var service = await baseServiceService.get();
+        setServices(service);
     }
+
+
     const getSetCategories = async () => {
-        var categories = await getData("ServiceCategories");
+        var categories = await baseServiceCategory.get();
         setCategories(categories);
     }
 
@@ -60,9 +75,7 @@ const DataTable = (props) => {
     const servicesData = useMemo(() => {
         let computedServices = services.filter(x => (x.Name.toLowerCase().includes(search.toLowerCase()) &&
             (serviceCategoryFilter === "" || (x.ServiceCategoryId === serviceCategoryFilter))));
-            console.log(services);
 
-        console.log(serviceCategoryFilter);
         if (sorting.field) {
             const reversed = sorting.order === 'asc' ? 1 : -1;
             computedServices = computedServices.sort((a, b) =>
@@ -82,19 +95,25 @@ const DataTable = (props) => {
     }, [categories])
 
     const deleteField = (id) => {
-        deleteData("Services", id);
-        getSetServices();
+        baseServiceService.delete(id)
         setShowConfirmationModal(false);
+        notify(deleteToastMessage);
     }
     return (
         <>
-            <Confirmation show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)} onSubmit={() => deleteField(deleteServiceId)} />
+            <ToastContainer />
+            <Confirmation show={showConfirmationModal}
+                onHide={() => setShowConfirmationModal(false)}
+                onSubmit={() =>
+                    deleteField(deleteServiceId)} />
+
             <AddService show={showAddServiceModal} onHide={() => SetShowAddServiceModal(false)}
                 onSucces={(value) => {
-                    addData("Services", value);
+                    baseServiceService.add(value);
                     SetShowAddServiceModal(false);
-                    getSetServices();
+                    notify(addToastMessage)
                 }} />
+
             <Container>
                 <div className="row w-100 mt-5">
                     <div className="col mb-3 col-12 text-center">
@@ -130,7 +149,7 @@ const DataTable = (props) => {
                             </div>
 
                         </div>
-                        <table className="table table-striped mb-5">
+                        <Table>
                             <TableHeader headers={headers} onSorting={(field, order) => setSorting({ field, order })} />
                             <tbody>
                                 {servicesData.map((service) => (
@@ -142,20 +161,17 @@ const DataTable = (props) => {
                                         <td>{service.Duration}</td>
                                         <td>
                                             <a className="btn text-primary">
-                                                <i className="fas fa-pencil-alt" onClick={()=>history.push("/EditService/"+service.Id)}>U</i>
+                                                <i onClick={() => history.push("/EditService/" + service.Id)}><PencilSquare /></i>
                                             </a>
-                                            <a className="btn text-danger">
-                                                <i onClick={() => {
-                                                    setShowConfirmationModal(true)
-                                                    setDeleteServiceId(service.Id)
-                                                }}>D</i>
-                                            </a>
+                                            <a className="btn text-danger"><i onClick={() => {
+                                                setShowConfirmationModal(true)
+                                                setDeleteServiceId(service.Id)
+                                            }}><Trash /></i></a>
                                         </td>
                                     </tr>
                                 ))}
-
                             </tbody>
-                        </table>
+                        </Table>
                         <div className="row">
                             <div className="col-md-6">
                                 <Pagination
@@ -165,13 +181,9 @@ const DataTable = (props) => {
                                     onPageChange={page => setCurrentPage(page)}
                                 />
                             </div>
-
                         </div>
                     </div>
                 </div>
-                <Switch>
-            {/* <Route path={props.match.url+'/EditService/:id'} exact component={EditService} /> */}
-            </Switch>
             </Container>
         </>
     )

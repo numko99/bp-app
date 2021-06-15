@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Button, Form, Col, Row } from 'react-bootstrap'
-import getData from '../../../../common/Api/getData';
-import getDataById from '../../../../common/Api/getDataById';
-import updateData from '../../../../common/Api/updateData';
-import {useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
+import * as Icon from 'react-bootstrap-icons'
+import BaseService from '../../../../common/Api/BaseService';
+import { service,serviceCategory } from '../../../../common/Collections';
+
 
 const EditService = (props) => {
     const initialFieldValues = {
@@ -17,17 +18,20 @@ const EditService = (props) => {
         WaitingTime: false,
         WaitingTimeDuration: ""
     }
-    var history=useHistory();
+    var history = useHistory();
+    let baseServiceService=new BaseService(service);
+    let baseServiceCategory = new BaseService(serviceCategory);
+
     const [values, setValues] = useState(initialFieldValues);
     const [categories, setCategories] = useState([]);
 
     const getSetCategories = async () => {
-        var categories = await getData("ServiceCategories");
+        var categories = await baseServiceCategory.get();
         setCategories(categories);
     }
 
     const getSetService = async () => {
-        var service = await getDataById("Services", props.match.params.id);
+        var service = await baseServiceService.getById(props.match.params.id);
         setValues(service);
     }
 
@@ -38,7 +42,7 @@ const EditService = (props) => {
 
     const handleInputChanges = e => {
         let { name, value } = e.target;
-        value = e.target.type === 'checkbox' ? !values[name] : value;
+        value = e.target.type === 'checkbox' ? e.target.checked : value;
         setValues({
             ...values,
             [name]: value
@@ -47,24 +51,24 @@ const EditService = (props) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-         updateData("Services",values).catch(err=>console.log(err));
-         history.push("/")
-    }
+        let object={...values};
+        if (!values.WaitingTime || (values.WaitingTimeDuration==0 || values.WaitingTimeDuration.trim()==='')) {
+            object={
+                ...values,
+                WaitingTimeDuration:"",
+                WaitingTime:false
+            };
+        }
 
-
-    var waitingTimeDuration = null;
-    if (values.WaitingTime) {
-        waitingTimeDuration = (
-            <Col>
-                <Form.Label>Duration</Form.Label>
-                <Form.Control type="number" onChange={handleInputChanges} value={values.waitingTimeDuration} name="WaitingTimeDuration" placeholder="Enter duration" />
-
-            </Col>);
+        baseServiceService.update(object);
+        
+        history.push("/")
     }
 
     return (
         <>
             <Container>
+                <Icon.ArrowLeftCircle size={30} className="mt-3" style={{cursor:'pointer'}} onClick={()=>history.goBack()}/>
                 <Form className="mt-5" onSubmit={handleSubmit}>
                     <Row className="mb-2">
                         <Col md={8}>
@@ -111,10 +115,14 @@ const EditService = (props) => {
                     <Row className="mb-2">
                         <Col className="mt-2">
                             <Form.Label></Form.Label>
-                            <Form.Check type="checkbox" onChange={handleInputChanges} value={values.waitingTime} name="WaitingTime" label="Waiting time" />
+                            <Form.Check type="checkbox" onChange={handleInputChanges} checked={values.WaitingTime} name="WaitingTime" label="Waiting time" />
 
                         </Col>
-                        {waitingTimeDuration}
+                        <Col>
+                            <Form.Label>Duration</Form.Label>
+                            <Form.Control type="number" onChange={handleInputChanges} disabled={!values.WaitingTime} value={values.WaitingTimeDuration} name="WaitingTimeDuration" placeholder="Enter duration" />
+
+                        </Col>
 
                     </Row>
                     <Row className="row mt-5 d-flex justify-content-end">

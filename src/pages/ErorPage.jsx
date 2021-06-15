@@ -1,8 +1,6 @@
 import React from 'react'
-
+import Error from '../component/Eror404/Error404';
 const ErorPage=()=>(
-    <React.Fragment>
-        Eror 404
-    </React.Fragment>
+        <Error/>
 )
 export default ErorPage;
