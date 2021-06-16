@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Icon from 'react-bootstrap-icons'
 import { useHistory } from 'react-router';
-const Error404 = (props) =>{ 
+const Error404 = () =>{ 
     const history=useHistory();
 return(<div>
     <div className="d-flex justify-content-center mt-5">

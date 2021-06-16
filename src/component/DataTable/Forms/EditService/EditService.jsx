@@ -10,8 +10,8 @@ const EditService = (props) => {
     const initialFieldValues = {
         Name: '',
         Code: '',
-        Price: 0,
-        Duration: 0,
+        Price: '',
+        Duration: '',
         Color: '',
         isDeleted: false,
         ServiceCategoryId: "DEFAULT",
@@ -43,6 +43,7 @@ const EditService = (props) => {
     const handleInputChanges = e => {
         let { name, value } = e.target;
         value = e.target.type === 'checkbox' ? e.target.checked : value;
+
         setValues({
             ...values,
             [name]: value
@@ -61,7 +62,6 @@ const EditService = (props) => {
         }
 
         baseServiceService.update(object);
-        
         history.push("/")
     }
 

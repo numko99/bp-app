@@ -27,7 +27,6 @@ const AddService = ({ show, onHide, onSucces }) => {
         const getSetCategories = async () => {
             var categories = await baseServiceCategory.get();
             setCategories(categories);}
-            
         getSetCategories();
     }, [])
     const handleInputChanges = e => {

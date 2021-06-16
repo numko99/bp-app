@@ -8,22 +8,22 @@ const TableHeader = ({ headers,onSorting }) => {
 
     // const [isShown, setIsShown] = useState(false);
 
-    const onSortingChange=(field)=>{
+    const onSortingChange=(field,type)=>{
         const order=field===sortingField && sortingOrder==='asc'?'desc':'asc';
 
         setSortingField(field);
         setSortingOrder(order);
         
-        onSorting(field,order);
+        onSorting(field,order,type);
     }
     return (
         <thead>
             <tr>
-                {headers.map(({ name, field, sortable }) =>
+                {headers.map(({ name, field,type, sortable }) =>
                 (<th key={field} style={{cursor:'pointer'}}
                     // onMouseEnter={() => setIsShown(true)}  
                     // onMouseLeave={() => setIsShown(false)}
-                    onClick={() => sortable ? onSortingChange(field) : null} >
+                    onClick={() => sortable ? onSortingChange(field,type) : null} >
                     {name}
                     {
                          sortingField && sortingField===field && (
