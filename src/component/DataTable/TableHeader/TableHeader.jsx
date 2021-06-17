@@ -21,8 +21,7 @@ const TableHeader = ({ headers,onSorting }) => {
             <tr>
                 {headers.map(({ name, field,type, sortable }) =>
                 (<th key={field} style={{cursor:'pointer'}}
-                    // onMouseEnter={() => setIsShown(true)}  
-                    // onMouseLeave={() => setIsShown(false)}
+
                     onClick={() => sortable ? onSortingChange(field,type) : null} >
                     {name}
                     {

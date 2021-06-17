@@ -1,5 +1,7 @@
 import React from 'react'
+// import DataTable from '../component/DataTable/Index';
 import DataTable from '../component/DataTable/Index';
+
 const Home = () =>{
  return(
         <DataTable/>

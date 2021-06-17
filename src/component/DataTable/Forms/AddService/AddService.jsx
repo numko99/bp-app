@@ -36,6 +36,9 @@ const AddService = ({ show, onHide, onSucces }) => {
             [name]: value
         })
     }
+    const HandleSubmit=()=>{
+        onSucces({CreatedAt:Date().toLocaleString(),...values});
+    }
     return (
         <>
 
@@ -92,7 +95,7 @@ const AddService = ({ show, onHide, onSucces }) => {
                         <Button variant="secondary" onClick={onHide}>
                             Close
                         </Button>
-                        <Button variant="primary" onClick={() => onSucces(values)}>
+                        <Button variant="primary" onClick={HandleSubmit}>
                             Save Changes
                         </Button>
                     </Modal.Footer>

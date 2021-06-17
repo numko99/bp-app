@@ -7,7 +7,7 @@ const Filter = ({ serviceCategories, onChangeFilter }) => {
         <Form.Group>
             <Form.Label>
                     <Form.Control as="select" onChange={(e) => onChangeFilter(e.target.value)} >
-                        <option value="" >Choose category</option>
+                        <option value='' >Choose category</option>
                         {serviceCategories.map(c => (
                             <option 
                                 key={c.Id}

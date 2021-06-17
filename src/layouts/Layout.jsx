@@ -4,10 +4,10 @@ import Sidebar from '../component/Navigation/Sidebar/Sidebar'
 const Layout = ({ children }) => (
     <React.Fragment>
         <div style={{display:'flex',flexFlow:'row' }}>
-            <div style={{width:'15%'}}>
+            <div>
             <Sidebar />
             </div>
-            <main style={{width:'85%'}}>{children}</main>
+            <main style={{width:'85%',marginLeft:'280px'}}>{children}</main>
             <footer></footer>
         </div>
     </React.Fragment>

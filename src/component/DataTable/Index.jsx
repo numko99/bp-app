@@ -18,21 +18,19 @@ import { PencilSquare, Trash } from 'react-bootstrap-icons'
 import { withRouter } from "react-router";
 import { useHistory } from 'react-router-dom'
 import { Container, Button, Table } from 'react-bootstrap'
-import firebase from '../../common/firebase'
-import CustomServicesService from '../../common/Api/CusomServicesService'
 const DataTable = (props) => {
-    const ref = firebase.firestore().collection("Services");
 
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
 
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 5;
+    const ITEMS_PER_PAGE = 10;
 
     const [search, setSearch] = useState("");
     const [serviceCategoryFilter, setServiceCategoryFilter] = useState("");
-    const [sorting, setSorting] = useState({ field: "", order: "",type:"" });
+
+    const [sorting, setSorting] = useState({ field: "", order: ""});
 
     const [showAddServiceModal, SetShowAddServiceModal] = useState(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -42,7 +40,6 @@ const DataTable = (props) => {
     const history = useHistory();
     let baseServiceService = new BaseService(service);
     let baseServiceCategory = new BaseService(serviceCategory);
-    let customServicesService = new CustomServicesService(service);
 
 
     const headers = [
@@ -56,65 +53,44 @@ const DataTable = (props) => {
 
     const getSetServices = async () => {
         var service = await baseServiceService.get();
+        service.sort((a,b)=>{
+            console.log(a.CreatedAt);
+            return new Date(b.CreatedAt) - new Date(a.CreatedAt);
+        });
         setServices(service);
+        
     }
-
 
     const getSetCategories = async () => {
         var categories = await baseServiceCategory.get();
         setCategories(categories);
 
     }
-    const getCustomServices=async()=>{
-        var orderField='CreatedAt';
-        var servi=  await customServicesService.goAheadPaging(services,orderField,ITEMS_PER_PAGE);
-        setServices(servi);
-    }
-
     useEffect(() => {
         var getDataa = async () => {
-            //getSetServices();
+            getSetServices();
             getSetCategories();
-            getCustomServices();
         }
         getDataa();
     }, [])
 
 
-    // const servicesData = useMemo(() => {
-    //     let computedServices = services.filter(x => (x.Name.toLowerCase().includes(search.toLowerCase()) &&
-    //         (serviceCategoryFilter === "" || (x.ServiceCategoryId === serviceCategoryFilter))));
+    const servicesData = useMemo(() => {
+        let computedServices = services.filter(x => (x.Name.toLowerCase().includes(search.toLowerCase()) &&
+            (serviceCategoryFilter === "" || (x.ServiceCategoryId === serviceCategoryFilter))));
 
-    //     if (sorting.field) {
-    //         const reversed = sorting.order === 'asc' ? 1 : -1;
-    //         console.log(sorting.type);
-    //         computedServices = computedServices.sort((a, b) =>
-    //          sorting.type== 'number' ? reversed * (a[sorting.field]-b[sorting.field]) : reversed* a[sorting.field].localeCompare(b[sorting.field])
-    //         );
-    //     }
-    //     setTotalItems(computedServices.length);
-    //     return computedServices.slice(
-    //         (currentPage - 1) * ITEMS_PER_PAGE,
-    //         (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE);
-    // }, [services, currentPage, search, sorting, serviceCategoryFilter])
-
-
-    const goAhead=()=>{
-        getCustomServices();
-    }
-    const goBack=async()=>{
-        
-        var orderField='CreatedAt';
-        var servi=await customServicesService.goBackPaging(services,orderField,ITEMS_PER_PAGE);
-        setServices(servi);
-      
-    }
-    // const servicesData = useMemo(() => {
-
- 
-
-
-    // }, [currentPage, search, sorting, serviceCategoryFilter])
+        if (sorting.field) {
+            const reversed = sorting.order === 'asc' ? 1 : -1;
+            console.log(sorting.type);
+            computedServices = computedServices.sort((a, b) =>
+             sorting.type== 'number' ? reversed * (a[sorting.field]-b[sorting.field]) : reversed* a[sorting.field].localeCompare(b[sorting.field])
+            );
+        }
+        setTotalItems(computedServices.length);
+        return computedServices.slice(
+            (currentPage - 1) * ITEMS_PER_PAGE,
+            (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE);
+    }, [services, currentPage, search, sorting, serviceCategoryFilter])
 
 
 
@@ -128,7 +104,6 @@ const DataTable = (props) => {
         setShowConfirmationModal(false);
         notify(deleteToastMessage);
         getSetServices();
-        // services.forEach(s=>baseServiceService.delete(s.Id))
     }
     const addHanlder = (value) => {
        
@@ -136,33 +111,8 @@ const DataTable = (props) => {
         SetShowAddServiceModal(false);
         notify(addToastMessage)
         getSetServices();
-        // for(let i=40;i<80;i++)
-        // {
-        //     baseServiceService.add({
-        //     Name: 'Usluga'+i,
-        //     Code: 'Code'+i,
-        //     Price: 200+i,
-        //     Duration: 110-i,
-        //     Color: '',
-        //     isDeleted: false,
-        //     ServiceCategoryId: 'PDlR8naMBrC124E3rAyA',
-        //     WaitingTime: false,
-        //     WaitingTimeDuration: '',
-        //     CreatedAt:Date().toLocaleString()})
-        // }
     }
-    // var index=services.length-1;
-    // var last=services[index]?services[index].Name:"";
-    // ref.orderBy("Name").startAfter(last).limit(ITEMS_PER_PAGE).onSnapshot((querySnapshot) => {
-    //     let items = [];
-    //     querySnapshot.forEach((doc) => {
-    //         items.push({ Id: doc.id, ...doc.data() });
-    //     });
-    //     if(items.length==0){
-    //         setDisableButton(true);
-            
-    //     }
-    // })
+
     return (
         <>
             <ToastContainer />
@@ -172,12 +122,9 @@ const DataTable = (props) => {
                     deleteHanlder(deleteServiceId)} />
 
             <AddService show={showAddServiceModal} onHide={() => SetShowAddServiceModal(false)}
-                onSucces={(value) => addHanlder({CreatedAt:Date().toLocaleString(),...value})} />
+                onSucces={(value) => addHanlder(value)} />
 
             <Container>
-                <button onClick={goBack} >Go back</button>
-                <button onClick={goAhead} disabled={disableButton}>Go ahead</button>
-
                 <div className="row w-100 mt-5">
                     <div className="col mb-3 col-12 text-center">
                         <div className="row mb-3 d-flex justify-content-end">
@@ -196,7 +143,6 @@ const DataTable = (props) => {
                                     currentPage={currentPage}
                                     onPageChange={page => {
                                         setCurrentPage(page)
-
                                        }
                                         }/>
 
@@ -204,8 +150,10 @@ const DataTable = (props) => {
                             <div className="col-4 d-flex flex-row-reverse">
                                 <Filter
                                     serviceCategories={serviceCategoryData}
-                                    onChangeFilter={(value) =>
-                                        setServiceCategoryFilter(value)} />
+                                    onChangeFilter={(value) =>{
+                                        setServiceCategoryFilter(value)
+                                    }}
+                                        />
                             </div>
                             <div className="col-4 d-flex flex-row-reverse">
                                 <Search
@@ -220,7 +168,7 @@ const DataTable = (props) => {
                             <TableHeader headers={headers} onSorting={(field, order,type) => {
                                 setSorting({ field, order,type })}} />
                             <tbody>
-                                {services.map((service) => (
+                                {servicesData.map((service) => (
 
                                     <tr key={service.Id}>
                                         <td>{service.Name}</td>
