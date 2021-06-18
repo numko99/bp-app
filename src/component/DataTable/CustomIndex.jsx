@@ -146,7 +146,7 @@ const DataTable = () => {
 
                             <div className="col-4 d-flex">
                                 <Filter
-                                    serviceCategories={categories}
+                                    dropDownList={categories}
                                     onChangeFilter={(value) => {
                                         setCustomServiceCategoryFilter(value)
                                     }}

@@ -17,15 +17,17 @@ import { ToastContainer } from 'react-toastify';
 import { PencilSquare, Trash } from 'react-bootstrap-icons'
 import { withRouter } from "react-router";
 import { useHistory } from 'react-router-dom'
-import { Container, Button, Table } from 'react-bootstrap'
-const DataTable = (props) => {
+import { Container, Button } from 'react-bootstrap'
+
+
+const DataTable = () => {
 
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
 
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 10;
+    const ITEMS_PER_PAGE = 5;
 
     const [search, setSearch] = useState("");
     const [serviceCategoryFilter, setServiceCategoryFilter] = useState("");
@@ -35,11 +37,18 @@ const DataTable = (props) => {
     const [showAddServiceModal, SetShowAddServiceModal] = useState(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [deleteServiceId, setDeleteServiceId] = useState(0);
-    const [disableButton, setDisableButton] = useState(false);
 
     const history = useHistory();
     let baseServiceService = new BaseService(service);
     let baseServiceCategory = new BaseService(serviceCategory);
+
+    useEffect(() => {
+        var getDataa = async () => {
+            getSetServices();
+            getSetCategories();
+        }
+        getDataa();
+    }, [])
 
 
     const headers = [
@@ -54,7 +63,6 @@ const DataTable = (props) => {
     const getSetServices = async () => {
         var service = await baseServiceService.get();
         service.sort((a,b)=>{
-            console.log(a.CreatedAt);
             return new Date(b.CreatedAt) - new Date(a.CreatedAt);
         });
         setServices(service);
@@ -66,14 +74,6 @@ const DataTable = (props) => {
         setCategories(categories);
 
     }
-    useEffect(() => {
-        var getDataa = async () => {
-            getSetServices();
-            getSetCategories();
-        }
-        getDataa();
-    }, [])
-
 
     const servicesData = useMemo(() => {
         let computedServices = services.filter(x => (x.Name.toLowerCase().includes(search.toLowerCase()) &&
@@ -91,7 +91,6 @@ const DataTable = (props) => {
             (currentPage - 1) * ITEMS_PER_PAGE,
             (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE);
     }, [services, currentPage, search, sorting, serviceCategoryFilter])
-
 
 
     const serviceCategoryData = useMemo(() => {
@@ -149,7 +148,7 @@ const DataTable = (props) => {
                             </div>
                             <div className="col-4 d-flex flex-row-reverse">
                                 <Filter
-                                    serviceCategories={serviceCategoryData}
+                                    dropDownList={serviceCategoryData}
                                     onChangeFilter={(value) =>{
                                         setServiceCategoryFilter(value)
                                     }}

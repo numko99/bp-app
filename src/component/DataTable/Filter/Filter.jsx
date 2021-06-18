@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form } from "react-bootstrap";
-const Filter = ({ serviceCategories, onChangeFilter }) => {
+const Filter = ({ dropDownList, onChangeFilter }) => {
 
     return (
         <Form>
@@ -8,7 +8,7 @@ const Filter = ({ serviceCategories, onChangeFilter }) => {
             <Form.Label>
                     <Form.Control as="select" onChange={(e) => onChangeFilter(e.target.value)} >
                         <option value='' >Choose category</option>
-                        {serviceCategories.map(c => (
+                        {dropDownList.map(c => (
                             <option 
                                 key={c.Id}
                                 value={c.Id}>

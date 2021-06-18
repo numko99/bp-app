@@ -4,7 +4,8 @@ import { useHistory } from 'react-router-dom'
 import * as Icon from 'react-bootstrap-icons'
 import BaseService from '../../../../common/Api/BaseService';
 import { service,serviceCategory } from '../../../../common/Collections';
-
+import { useContext } from 'react';
+import { ServiceCategoryContext } from '../../../../store/Services/ServiceCategoryContext';
 
 const EditService = (props) => {
     const initialFieldValues = {
@@ -20,15 +21,10 @@ const EditService = (props) => {
     }
     var history = useHistory();
     let baseServiceService=new BaseService(service);
-    let baseServiceCategory = new BaseService(serviceCategory);
 
     const [values, setValues] = useState(initialFieldValues);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useContext(ServiceCategoryContext);
 
-    const getSetCategories = async () => {
-        var categories = await baseServiceCategory.get();
-        setCategories(categories);
-    }
 
     const getSetService = async () => {
         var service = await baseServiceService.getById(props.match.params.id);
@@ -36,7 +32,6 @@ const EditService = (props) => {
     }
 
     useEffect(() => {
-        getSetCategories();
         getSetService();
     }, [])
 
