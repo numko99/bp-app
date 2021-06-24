@@ -38,6 +38,7 @@ const AddService = ({ show, onHide, onSucces }) => {
     }
     const HandleSubmit=()=>{
         onSucces({CreatedAt:Date().toLocaleString(),...values});
+        
     }
     return (
         <>

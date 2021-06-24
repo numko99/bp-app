@@ -23,7 +23,7 @@ const EditService = (props) => {
     let baseServiceService=new BaseService(service);
 
     const [values, setValues] = useState(initialFieldValues);
-    const [categories, setCategories] = useContext(ServiceCategoryContext);
+    const [categories] = useContext(ServiceCategoryContext);
 
 
     const getSetService = async () => {

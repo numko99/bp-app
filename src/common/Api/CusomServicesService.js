@@ -9,8 +9,9 @@ class CustomServicesService extends BaseService {
         this.ref = firebase.firestore().collection(collection);
 
     }
-
+    //PDlR8naMBrC124E3rAyA
     async CustomGet(sorting,ITEMS_PER_PAGE,filter) {
+        console.log(sorting);
         var tempRef=filter==''?this.ref:this.ref.where("ServiceCategoryId","==",filter);
         let items = await new Promise((resolve) => {
             tempRef.orderBy(sorting.field,sorting.order).

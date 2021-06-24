@@ -2,10 +2,24 @@ import React, { useState, createContext, useEffect, useMemo } from 'react'
 import BaseService from '../../common/Api/BaseService';
 import { service } from '../../common/Collections';
 
+import { useLocalStore } from 'mobx-react';
+
 export const ServiceContext = createContext();
 
 export const ServiceProvider = props => {
     let baseServiceService = new BaseService(service);
+    // const store=useLocalStore(()=>({
+    //     services:[],
+    //     totalItems:0,
+    //     currentPage:1,
+    //     sorting : { field: "", order: "", type: "" },
+    //     ITEMS_PER_PAGE:5,
+
+    //     search:"",
+    //     filter:"",
+    //     addService:addService,
+    //     deleteService:deleteService
+    // }));
     const [services, setServices] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);

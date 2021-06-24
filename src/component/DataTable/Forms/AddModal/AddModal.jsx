@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { Modal, Button, Form, Col, Row } from 'react-bootstrap'
 import './AddModal.css'
 import { ServiceCategoryContext } from '../../../../store/Services/ServiceCategoryContext'
-import { ServiceContext } from '../../../../store/Services/ServicesContext'
+import { ServiceContext } from '../../../../store/Services/ServicesContext2'
 
 const AddModal = ({ show, onHide, onSucces }) => {
 
     const [values, setValues] = useState([]);
-    const [serviceCategories, setServiceCategories] = useContext(ServiceCategoryContext);
+    const [serviceCategories] = useContext(ServiceCategoryContext);
     const services= useContext(ServiceContext);
 
 
@@ -20,7 +20,7 @@ const AddModal = ({ show, onHide, onSucces }) => {
     }
     const HandleSubmit=()=>{
 
-        services.add(values);
+        services.addService(values);
         onSucces();
     }
     return (

@@ -15,13 +15,13 @@ import { Container, Button } from 'react-bootstrap'
 import ServiceTable from './Table/ServiceTable'
 
 const DataTable = ({ headers, mainList, filterList }) => {
-  
+
     const [showAddModal, SetShowAddModal] = useState(false);
     const addHanlder = () => {
         SetShowAddModal(false);
         notify(addToastMessage)
     }
-    console.log(mainList);
+
     return (
         <>
             <ToastContainer />
@@ -40,7 +40,7 @@ const DataTable = ({ headers, mainList, filterList }) => {
                         </div>
 
 
-                        <div className="row mb-3">
+                        {/* <div className="row mb-3">
                             <div className="col-4">
                                 <Pagination
                                     total={mainList.totalItems[0]}
@@ -57,6 +57,7 @@ const DataTable = ({ headers, mainList, filterList }) => {
                                     dropDownList={filterList[0]}
                                     onChangeFilter={(value) => {
                                         mainList.filter[1](value)
+                                        mainList.currentPage[1](1)
                                     }}
                                 />
                             </div>
@@ -66,14 +67,15 @@ const DataTable = ({ headers, mainList, filterList }) => {
                                         mainList.search[1](value)
                                         mainList.currentPage[1](1)
                                     }} />
-                            </div>
+                            </div> 
 
                         </div>
+                        */}
                         <ServiceTable
-                            headers={headers}/>
+                            headers={headers} />
                         <div className="row">
-                            <div className="col-md-6">
-                            <Pagination
+                            {/* <div className="col-md-6">
+                                <Pagination
                                     total={mainList.totalItems[0]}
                                     itemsPerPage={mainList.itemsPerPage}
                                     currentPage={mainList.currentPage[0]}
@@ -82,7 +84,7 @@ const DataTable = ({ headers, mainList, filterList }) => {
                                     }
                                     } />
 
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

@@ -50,6 +50,7 @@ const DataTable = () => {
         { name: 'Action', field: 'Action', sortable: false },]
 
     useEffect(() => {
+   
         var getDataa = async () => {
             getSetCategories();
             getCustomServices();
