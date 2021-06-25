@@ -1,25 +1,13 @@
-import React, { useState, createContext, useEffect } from 'react'
-import BaseService from '../../common/Api/BaseService';
-import { serviceCategory } from '../../common/Collections';
-
+import React, { createContext, useContext} from 'react'
+import { createServiceCategoryStore } from './serviceCategoryStore';
+import { useLocalStore } from 'mobx-react';
 
 export const ServiceCategoryContext = createContext();
 
-export const ServiceCategoryProvider = props => {
-    let baseServiceCategory=new BaseService(serviceCategory);
-    
-    const [serviceCategories, setServiceCategories] = useState([]);
-
-    useEffect(() => {
-        var getData = async () => {
-            var categories = await baseServiceCategory.get();
-            setServiceCategories(categories);
-        }
-        getData();
-    }, [])
-
+export const ServiceCategoryProvider = (props) => {
+    const servicesCategoryStore= useLocalStore(createServiceCategoryStore);
     return (
-        <ServiceCategoryContext.Provider value={[serviceCategories, setServiceCategories]}>
+        <ServiceCategoryContext.Provider value={servicesCategoryStore}>
             {props.children}
         </ServiceCategoryContext.Provider>
     )

@@ -7,12 +7,15 @@ import { ServiceContext } from '../../../../store/Services/ServicesContext2'
 const AddModal = ({ show, onHide, onSucces }) => {
 
     const [values, setValues] = useState([]);
-    const [serviceCategories] = useContext(ServiceCategoryContext);
+    const serviceCategories = useContext(ServiceCategoryContext);
     const services= useContext(ServiceContext);
 
-
     const handleInputChanges = e => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+        if(e.target.type==="number")
+        {
+            value=parseInt(e.target.value);
+        }
         setValues({
             ...values,
             [name]: value
@@ -20,7 +23,7 @@ const AddModal = ({ show, onHide, onSucces }) => {
     }
     const HandleSubmit=()=>{
 
-        services.addService(values);
+        services.addService({CreatedAt : new Date(), ...values});
         onSucces();
     }
     return (
@@ -59,8 +62,9 @@ const AddModal = ({ show, onHide, onSucces }) => {
                                 <Form.Label>Category</Form.Label>
                                 <Form.Control as="select" onChange={handleInputChanges} defaultValue="DEFAULT" name="ServiceCategoryId">
                                     <option disabled value="DEFAULT">Choose Category</option>
-                                    {serviceCategories.map(s => (
+                                    {serviceCategories.servicesCategories.map(s => (
                                         <option key={s.Id} value={s.Id}>{s.Name}</option>
+                                        
                                     ))}
                                 </Form.Control>
                             </Col>

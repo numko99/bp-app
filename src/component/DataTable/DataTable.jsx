@@ -1,9 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 
-import Pagination from './Pagination/Pagination'
-import Search from './Search/Search'
 import Filter from './Filter/Filter'
-
+import { ArrowLeft, ArrowRight } from 'react-bootstrap-icons'
 import AddModal from './Forms/AddModal/AddModal'
 
 import { addToastMessage } from '../../common/Toast/ToastMessages'
@@ -12,16 +10,19 @@ import { notify } from '../../common/Toast/ToastNotification'
 import { ToastContainer } from 'react-toastify';
 import { withRouter } from "react-router";
 import { Container, Button } from 'react-bootstrap'
-import ServiceTable from './Table/ServiceTable'
 
-const DataTable = ({ headers, mainList, filterList }) => {
+const DataTable = ({ context, categoryContext, children }) => {
 
     const [showAddModal, SetShowAddModal] = useState(false);
+
     const addHanlder = () => {
         SetShowAddModal(false);
         notify(addToastMessage)
     }
-
+    const goahead=()=>{
+        context.goAhead();
+    }
+    
     return (
         <>
             <ToastContainer />
@@ -40,51 +41,38 @@ const DataTable = ({ headers, mainList, filterList }) => {
                         </div>
 
 
-                        {/* <div className="row mb-3">
+                        <div className="row mb-3">
                             <div className="col-4">
-                                <Pagination
-                                    total={mainList.totalItems[0]}
-                                    itemsPerPage={mainList.itemsPerPage}
-                                    currentPage={mainList.currentPage[0]}
-                                    onPageChange={page => {
-                                        mainList.currentPage[1](page)
-                                    }
-                                    } />
+                                <div className="col-4 d-flex flex-row">
+
+                                    <button className="btn" onClick={context.goBack} ><ArrowLeft /></button>
+                                    <button className="btn"   onClick={goahead} > <ArrowRight /></button>
+                                </div>
 
                             </div>
                             <div className="col-4 d-flex flex-row-reverse">
                                 <Filter
-                                    dropDownList={filterList[0]}
+                                    dropDownList={categoryContext.servicesCategories}
                                     onChangeFilter={(value) => {
-                                        mainList.filter[1](value)
-                                        mainList.currentPage[1](1)
+                                        context.setFilter(value);
                                     }}
                                 />
                             </div>
-                            <div className="col-4 d-flex flex-row-reverse">
-                                <Search
-                                    changeSearch={(value) => {
-                                        mainList.search[1](value)
-                                        mainList.currentPage[1](1)
-                                    }} />
-                            </div> 
+                 
 
                         </div>
-                        */}
-                        <ServiceTable
-                            headers={headers} />
-                        <div className="row">
-                            {/* <div className="col-md-6">
-                                <Pagination
-                                    total={mainList.totalItems[0]}
-                                    itemsPerPage={mainList.itemsPerPage}
-                                    currentPage={mainList.currentPage[0]}
-                                    onPageChange={page => {
-                                        mainList.currentPage[1](page)
-                                    }
-                                    } />
 
-                            </div> */}
+
+                        {children}
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="col-4 d-flex flex-row">
+
+                                    <button className="btn" onClick={context.goBack} ><ArrowLeft /></button>
+                                    <button className="btn" onClick={context.goAhead} > <ArrowRight /></button>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>

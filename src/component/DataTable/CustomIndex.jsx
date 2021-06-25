@@ -50,7 +50,7 @@ const DataTable = () => {
         { name: 'Action', field: 'Action', sortable: false },]
 
     useEffect(() => {
-   
+      
         var getDataa = async () => {
             getSetCategories();
             getCustomServices();
@@ -141,8 +141,8 @@ const DataTable = () => {
                         <div className="row mb-3">
                             <div className="col-4 d-flex flex-row">
 
-                                <button className="btn" onClick={goBack} disabled={backDisableButton}><ArrowLeft /></button>
-                                <button className="btn" onClick={goAhead} disabled={nextDisableButton}> <ArrowRight /></button>
+                                <button className="btn" onClick={goBack} ><ArrowLeft /></button>
+                                <button className="btn" onClick={goAhead} > <ArrowRight /></button>
                             </div>
 
                             <div className="col-4 d-flex">

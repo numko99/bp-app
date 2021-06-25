@@ -14,7 +14,6 @@ const EditService = (props) => {
         Price: '',
         Duration: '',
         Color: '',
-        isDeleted: false,
         ServiceCategoryId: "DEFAULT",
         WaitingTime: false,
         WaitingTimeDuration: ""
@@ -23,21 +22,25 @@ const EditService = (props) => {
     let baseServiceService=new BaseService(service);
 
     const [values, setValues] = useState(initialFieldValues);
-    const [categories] = useContext(ServiceCategoryContext);
+    const categories = useContext(ServiceCategoryContext);
 
 
     const getSetService = async () => {
         var service = await baseServiceService.getById(props.match.params.id);
         setValues(service);
     }
+    const getCategories = async () => {
+        categories.getServiceCategory();
+    }
 
     useEffect(() => {
         getSetService();
+        getCategories();
     }, [])
 
     const handleInputChanges = e => {
         let { name, value } = e.target;
-        value = e.target.type === 'checkbox' ? e.target.checked : value;
+        value = e.target.type === 'checkbox' ? e.target.checked : e.target.type==='number'?parseInt(value):value;
 
         setValues({
             ...values,
@@ -57,7 +60,7 @@ const EditService = (props) => {
         }
 
         baseServiceService.update(object);
-        history.push("/")
+        history.push("/services")
     }
 
     return (
@@ -92,7 +95,7 @@ const EditService = (props) => {
                             <Form.Label>Category</Form.Label>
                             <Form.Control as="select" onChange={handleInputChanges} value={values.ServiceCategoryId} name="ServiceCategoryId">
                                 <option disabled value="DEFAULT">Choose Category</option>
-                                {categories.map(s => (
+                                {categories.servicesCategories.map(s => (
                                     <option key={s.Id} value={s.Id}>{s.Name}</option>
                                 ))}
                             </Form.Control>
